@@ -13,7 +13,7 @@ const wss = new WebSocket.Server({ server });
 wss.on("connection", (socket) => {
   socket.on("close", () => console.log("browser close socket connection"));
   socket.on("message", (message) => {
-    console.log(message.toString());
+    socket.send(message.toString());
   });
   socket.send("hellloooooo");
 });
