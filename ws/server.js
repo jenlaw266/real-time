@@ -10,12 +10,22 @@ app.get("/", (req, res) => res.render("home"));
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
+const sockets = [];
+
 wss.on("connection", (socket) => {
+  sockets.push(socket);
+  socket.nickname = "Anon";
   socket.on("close", () => console.log("browser close socket connection"));
   socket.on("message", (message) => {
-    socket.send(message.toString());
+    const newMessage = JSON.parse(message);
+    if (newMessage.type === "newMessage") {
+      sockets.forEach((aSocket) =>
+        aSocket.send(`${socket.nickname}: ${newMessage.payload}`)
+      );
+    } else if (newMessage.type === "name") {
+      socket.nickname = newMessage.payload;
+    }
   });
-  socket.send("hellloooooo");
 });
 
 server.listen(4000, () => console.log("server connected"));
